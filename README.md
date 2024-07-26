@@ -1,6 +1,6 @@
 # GitHubRepositories
 This project is a Java application that retrieves information about user's GitHub non-fork repositories and their branches. 
-It uses the GitHub API to fetch repository details, including the repository name, owner's login, and branch information (it's name and commit sha).
+It uses the GitHub API to fetch repository details, including the repository name, owner's login, and branch information (it's name and last commit sha).
 
 ## Technologies
 - Java 21
