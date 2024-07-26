@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @ToString
 public class RepositoryInfo {
-    private String name;
+    private String repositoryName;
     private String ownerLogin;
-    private List<BranchInfo> branchInfoList;
+    private List<BranchInfo> branches;
 }
