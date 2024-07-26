@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.project.githubrepositories.http.dto.BranchResponse;
 import org.project.githubrepositories.http.dto.GitHubResponse;
+import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.BranchInfo;
 import org.project.githubrepositories.repository.RepositoryInfo;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -70,6 +72,9 @@ public class GitHubHttpClient {
         } catch (ResponseStatusException e) {
             log.error(String.format("Error, user %s not found: %s", username, e.getMessage()));
             throw new GitHubUserNotFoundException(username);
+        } catch (RestClientException e) {
+            log.error("Error, API rate limit exceeded");
+            throw new ApiRateLimitException();
         }
     }
 
