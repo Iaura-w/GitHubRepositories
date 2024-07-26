@@ -9,5 +9,4 @@ public class GitHubRepositoriesApplication {
     public static void main(String[] args) {
         SpringApplication.run(GitHubRepositoriesApplication.class, args);
     }
-
 }
