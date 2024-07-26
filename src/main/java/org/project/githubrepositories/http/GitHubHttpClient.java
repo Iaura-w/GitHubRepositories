@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.project.githubrepositories.http.dto.BranchResponse;
 import org.project.githubrepositories.http.dto.GitHubResponse;
+import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.BranchInfo;
 import org.project.githubrepositories.repository.RepositoryInfo;
 import org.springframework.core.ParameterizedTypeReference;
@@ -66,6 +67,9 @@ public class GitHubHttpClient {
         } catch (ResourceAccessException e) {
             log.error(String.format("Error while fetching repositories for user %s using http client: %s ", username, e.getMessage()));
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ResponseStatusException e) {
+            log.error(String.format("Error, user %s not found: %s", username, e.getMessage()));
+            throw new GitHubUserNotFoundException(username);
         }
     }
 
