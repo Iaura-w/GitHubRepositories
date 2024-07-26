@@ -1,6 +1,7 @@
 package org.project.githubrepositories.repository.error;
 
 import lombok.extern.log4j.Log4j2;
+import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,9 +16,18 @@ public class RepositoryInfoErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(GitHubUserNotFoundException.class)
     @ResponseBody
-    public RepositoryErrorResponse offerNotFound(GitHubUserNotFoundException exception) {
+    public RepositoryErrorResponse userNotFound(GitHubUserNotFoundException exception) {
         final String message = exception.getMessage();
         log.error(message);
         return new RepositoryErrorResponse(HttpStatus.NOT_FOUND, message);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ApiRateLimitException.class)
+    @ResponseBody
+    public RepositoryErrorResponse rateLimit(ApiRateLimitException exception) {
+        final String message = exception.getMessage();
+        log.error(message);
+        return new RepositoryErrorResponse(HttpStatus.FORBIDDEN, message);
     }
 }
