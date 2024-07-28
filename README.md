@@ -8,6 +8,7 @@ It uses the GitHub API to fetch repository details, including the repository nam
 - Lombok
 
 ## Application
+- To run application with Gradle: ```$ ./gradlew bootRun```
 - The application should be available at: http://localhost:8080
 - GET /repositories/{username}: Retrieves a list of repositories for the specified GitHub username along with informations.
 ## Example responses:
