@@ -9,18 +9,12 @@ import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.BranchInfo;
 import org.project.githubrepositories.repository.RepositoryInfo;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class GitHubHttpClient {
-    private final RestTemplate restTemplate;
-    private static final String URL_GITHUB = "https://api.github.com/users/%s/repos";
+    private final WebClient webClient;
 
     public List<RepositoryInfo> getRepositoriesInformationForUser(String username) {
         List<GitHubResponse> gitHubResponseList = fetchRepositories(username);
@@ -38,66 +31,56 @@ public class GitHubHttpClient {
                 .toList();
 
         return repositoriesNotFork.stream()
-                .map(r -> {
-                    String branchesUrl = r.branchesUrl().substring(0, r.branchesUrl().indexOf("{"));
+                .map(repository -> {
+                    String branchesUrl = repository.branchesUrl().substring(0, repository.branchesUrl().indexOf("{"));
                     List<BranchResponse> branchResponseList = fetchBranches(branchesUrl);
                     List<BranchInfo> branchInfoList = branchResponseList.stream()
                             .map(Mapper::branchResponseToBranchInfoMapper)
                             .toList();
-                    return new RepositoryInfo(r.name(), r.owner().login(), branchInfoList);
+                    return new RepositoryInfo(repository.name(), repository.owner().login(), branchInfoList);
                 })
                 .collect(Collectors.toList());
     }
 
     private List<GitHubResponse> fetchRepositories(String username) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/vnd.github+json");
-
-        final HttpEntity<HttpHeaders> requestEntity = new HttpEntity<>(headers);
-        try {
-            String urlForService = String.format(URL_GITHUB, username);
-            final String url = UriComponentsBuilder.fromHttpUrl(urlForService).toUriString();
-            ResponseEntity<List<GitHubResponse>> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-            });
-            final List<GitHubResponse> body = response.getBody();
-            if (body == null) {
-                log.error("Response body null");
-                throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-            }
-            log.info("Success, response body returned: " + body);
-            return body;
-        } catch (ResourceAccessException e) {
-            log.error(String.format("Error while fetching repositories for user %s using http client: %s ", username, e.getMessage()));
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ResponseStatusException e) {
-            log.error(String.format("Error, user %s not found: %s", username, e.getMessage()));
-            throw new GitHubUserNotFoundException(username);
-        } catch (RestClientException e) {
-            log.error("Error, API rate limit exceeded");
-            throw new ApiRateLimitException();
-        }
+        String pathForUserRepository = String.format("/users/%s/repos", username);
+        Mono<List<GitHubResponse>> responseMono = webClient.get()
+                .uri(pathForUserRepository)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        log.info("Success, response body returned");
+                        return response.bodyToMono(new ParameterizedTypeReference<List<GitHubResponse>>() {
+                        });
+                    } else if (response.statusCode().isSameCodeAs(HttpStatusCode.valueOf(403))) {
+                        log.error("Error, API rate limit exceeded");
+                        return Mono.error(new ApiRateLimitException());
+                    } else if (response.statusCode().is4xxClientError()) {
+                        log.error(String.format("Error while fetching repositories for user %s using http client ", username));
+                        return Mono.error(new GitHubUserNotFoundException(username));
+                    } else {
+                        log.error("Error");
+                        return response.createException()
+                                .flatMap(Mono::error);
+                    }
+                });
+        return responseMono.block();
     }
+
 
     private List<BranchResponse> fetchBranches(String urlForService) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/vnd.github+json");
-
-        final HttpEntity<HttpHeaders> requestEntity = new HttpEntity<>(headers);
-        try {
-            final String url = UriComponentsBuilder.fromHttpUrl(urlForService).toUriString();
-            ResponseEntity<List<BranchResponse>> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-            });
-            final List<BranchResponse> body = response.getBody();
-            if (body == null) {
-                log.error("Response body null");
-                throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-            }
-            log.info("Success, response body returned: " + body);
-            return body;
-        } catch (ResourceAccessException e) {
-            log.error(String.format("Error while fetching branches for url %s using http client: %s ", urlForService, e.getMessage()));
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Mono<List<BranchResponse>> listMono = webClient.get()
+                .uri(URI.create(urlForService))
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        log.info("Success, response body returned");
+                        return response.bodyToMono(new ParameterizedTypeReference<List<BranchResponse>>() {
+                        });
+                    } else {
+                        log.error(String.format("Error while fetching branches for url %s using http client", urlForService));
+                        return response.createException()
+                                .flatMap(Mono::error);
+                    }
+                });
+        return listMono.block();
     }
-
 }
