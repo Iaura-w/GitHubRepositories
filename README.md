@@ -13,6 +13,7 @@ information (it's name and last commit sha).
 
 ## Application
 
+- To run application with Gradle: ```$ ./gradlew bootRun```
 - The application should be available at: http://localhost:8080
 - GET /repositories/{username}: Retrieves a list of repositories for the specified GitHub username along with
   informations.
