@@ -49,7 +49,7 @@ public class GitHubHttpClient {
                 .exchangeToMono(response -> {
                     if (response.statusCode().is2xxSuccessful()) {
                         log.info("Success, response body returned");
-                        return response.bodyToMono(new ParameterizedTypeReference<List<GitHubResponse>>() {
+                        return response.bodyToMono(new ParameterizedTypeReference<>() {
                         });
                     } else if (response.statusCode().isSameCodeAs(HttpStatusCode.valueOf(403))) {
                         log.error("Error, API rate limit exceeded");
@@ -73,7 +73,7 @@ public class GitHubHttpClient {
                 .exchangeToMono(response -> {
                     if (response.statusCode().is2xxSuccessful()) {
                         log.info("Success, response body returned");
-                        return response.bodyToMono(new ParameterizedTypeReference<List<BranchResponse>>() {
+                        return response.bodyToMono(new ParameterizedTypeReference<>() {
                         });
                     } else {
                         log.error(String.format("Error while fetching branches for url %s using http client", urlForService));
