@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +31,8 @@ public class GitHubHttpClient {
 
         return repositoriesNotFork.stream()
                 .map(repository -> {
-                    String branchesUrl = repository.branchesUrl().substring(0, repository.branchesUrl().indexOf("{"));
-                    List<BranchResponse> branchResponseList = fetchBranches(branchesUrl);
+                    String repositoryName = repository.name();
+                    List<BranchResponse> branchResponseList = fetchBranches(username, repositoryName);
                     List<BranchInfo> branchInfoList = branchResponseList.stream()
                             .map(Mapper::branchResponseToBranchInfoMapper)
                             .toList();
@@ -48,9 +47,10 @@ public class GitHubHttpClient {
                 .uri(pathForUserRepository)
                 .exchangeToMono(response -> {
                     if (response.statusCode().is2xxSuccessful()) {
-                        log.info("Success, response body returned");
-                        return response.bodyToMono(new ParameterizedTypeReference<>() {
+                        Mono<List<GitHubResponse>> responseBody = response.bodyToMono(new ParameterizedTypeReference<>() {
                         });
+                        log.info("Success, response body returned [{}]", responseBody);
+                        return responseBody;
                     } else if (response.statusCode().isSameCodeAs(HttpStatusCode.valueOf(403))) {
                         log.error("Error, API rate limit exceeded");
                         return Mono.error(new ApiRateLimitException());
@@ -67,16 +67,17 @@ public class GitHubHttpClient {
     }
 
 
-    private List<BranchResponse> fetchBranches(String urlForService) {
+    private List<BranchResponse> fetchBranches(String username, String repositoryName) {
+        String pathForRepositoryBranches = String.format("/repos/%s/%s/branches", username, repositoryName);
         Mono<List<BranchResponse>> listMono = webClient.get()
-                .uri(URI.create(urlForService))
+                .uri(pathForRepositoryBranches)
                 .exchangeToMono(response -> {
                     if (response.statusCode().is2xxSuccessful()) {
-                        log.info("Success, response body returned");
+                        log.info("Success, response body returned (branches)");
                         return response.bodyToMono(new ParameterizedTypeReference<>() {
                         });
                     } else {
-                        log.error(String.format("Error while fetching branches for url %s using http client", urlForService));
+                        log.error(String.format("Error while fetching branches for user %s repository %s ", username, repositoryName));
                         return response.createException()
                                 .flatMap(Mono::error);
                     }
