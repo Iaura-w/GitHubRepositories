@@ -145,4 +145,27 @@ class GitHubHttpClientConfigTest {
                 "]";
     }
 
+    public static String mockedResponseBranches200() {
+        return "[\n" +
+                "  {\n" +
+                "    \"name\": \"master\",\n" +
+                "    \"commit\": {\n" +
+                "      \"sha\": \"c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc\",\n" +
+                "      \"url\": \"https://api.github.com/repos/octocat/Hello-World/commits/c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc\"\n" +
+                "    },\n" +
+                "    \"protected\": true,\n" +
+                "    \"protection\": {\n" +
+                "      \"required_status_checks\": {\n" +
+                "        \"enforcement_level\": \"non_admins\",\n" +
+                "        \"contexts\": [\n" +
+                "          \"ci-test\",\n" +
+                "          \"linter\"\n" +
+                "        ]\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"protection_url\": \"https://api.github.com/repos/octocat/hello-world/branches/master/protection\"\n" +
+                "  }\n" +
+                "]";
+    }
+
 }

@@ -6,6 +6,8 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.project.githubrepositories.http.error.ApiRateLimitException;
+import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.RepositoryInfo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.httpClient;
 import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.mockedResponse200;
+import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.mockedResponseBranches200;
 
 
 class GitHubHttpClientTest {
@@ -43,17 +47,25 @@ class GitHubHttpClientTest {
     }
 
     @Test
-    void should_return_correct_response_when_existing_username_is_given() throws IOException {
+    void should_return_correct_response_when_existing_username_is_given() {
         // given
         String username = "some_user";
 
-        // when
         mockWebServer.enqueue(
                 new MockResponse()
                         .setResponseCode(HttpStatus.OK.value())
                         .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(mockedResponse200())
         );
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(HttpStatus.OK.value())
+                        .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(mockedResponseBranches200())
+        );
+
+        // when
         List<RepositoryInfo> actual = clientUnderTest.getRepositoriesInformationForUser(username);
 
         // then
@@ -61,9 +73,44 @@ class GitHubHttpClientTest {
                 () -> assertThat(actual).isNotNull(),
                 () -> assertThat(actual).hasSize(1),
                 () -> assertThat(actual.getFirst().repositoryName()).isEqualTo("Hello-World"),
-                () -> assertThat(actual.getFirst().ownerLogin()).isEqualTo("octocat")
+                () -> assertThat(actual.getFirst().ownerLogin()).isEqualTo("octocat"),
+                () -> assertThat(actual.get(0).branches().get(0).name()).isEqualTo("master")
         );
     }
 
+    @Test
+    void should_throw_exception_when_non_existing_username_is_given() {
+        // given
+        String username = "non_existing_user";
 
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(404)
+        );
+
+        // when
+        // then
+        Exception exception = assertThrows(GitHubUserNotFoundException.class, () ->
+                clientUnderTest.getRepositoriesInformationForUser(username)
+        );
+        assertThat(exception.getMessage()).isEqualTo("User %s not exists on GitHub", username);
+    }
+
+    @Test
+    void should_throw_exception_when_api_rate_limit_reached() {
+        // given
+        String username = "non_existing_user";
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(403)
+        );
+
+        // when
+        // then
+        Exception exception = assertThrows(ApiRateLimitException.class, () ->
+                clientUnderTest.getRepositoriesInformationForUser(username)
+        );
+        assertThat(exception.getMessage()).isEqualTo("GitHub API rate limit exceeded, try again later.");
+    }
 }
