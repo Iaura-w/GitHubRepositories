@@ -16,8 +16,8 @@ public class RepositoryInfoController {
     private final RepositoryInfoService service;
 
     @GetMapping("/{username}")
-    public ResponseEntity<List<RepositoryInfo>> getUserRepositories(@PathVariable String username) {
-        List<RepositoryInfo> repositories = service.getRepositoriesInfoForUser(username);
+    public ResponseEntity<List<RepositoryInfoDto>> getUserRepositories(@PathVariable String username) {
+        List<RepositoryInfoDto> repositories = service.getRepositoriesInfoForUser(username);
         return ResponseEntity.ok(repositories);
     }
 }
