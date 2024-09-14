@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.project.githubrepositories.http.RemoteHttpClient;
 import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
-
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
 public class RepositoryInfoService {
     private final RemoteHttpClient gitHubHttpClient;
     private final RepositoryInfoRepository repositoryInfoRepository;
+    private final Clock clock;
 
     public List<RepositoryInfoDto> getRepositoriesInfoForUser(String username) {
         List<RepositoryInfo> storedRepositories = repositoryInfoRepository.findAllByOwnerLogin(username);
@@ -37,6 +38,6 @@ public class RepositoryInfoService {
 
     private boolean isDataUpToDate(List<RepositoryInfo> storedRepositories) {
         LocalDateTime lastUpdated = storedRepositories.getFirst().lastUpdated();
-        return lastUpdated.isAfter(LocalDateTime.now().minusHours(1));
+        return lastUpdated.isAfter(LocalDateTime.now(clock).minusHours(1));
     }
 }
