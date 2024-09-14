@@ -10,6 +10,9 @@ This project is a Java application that retrieves information about a user's Git
 - MongoDB
 - Spring Data MongoDB
 - Docker Compose
+- JUnit
+- Mockito
+- MockWebServer
 
 ## Application
 - Use the `docker-compose.yml` file to start MongoDB: ``` docker-compose up -d ```
