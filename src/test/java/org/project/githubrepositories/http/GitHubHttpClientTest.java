@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
-import org.project.githubrepositories.repository.RepositoryInfo;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,14 +21,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.httpClient;
-import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.mockedResponse200;
-import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.mockedResponseBranches200;
+import static org.project.githubrepositories.http.GitHubHttpClientConfigTest.*;
 
 
 class GitHubHttpClientTest {
     public static MockWebServer mockWebServer;
-    public static GitHubHttpClient clientUnderTest;
+    public static RemoteHttpClient clientUnderTest;
 
     @BeforeAll
     static void setUp() {
@@ -66,7 +64,7 @@ class GitHubHttpClientTest {
         );
 
         // when
-        List<RepositoryInfo> actual = clientUnderTest.getRepositoriesInformationForUser(username);
+        List<RepositoryInfoDto> actual = clientUnderTest.getRepositoriesInformationForUser(username);
 
         // then
         assertAll(

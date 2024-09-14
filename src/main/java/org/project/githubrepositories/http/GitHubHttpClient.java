@@ -7,23 +7,24 @@ import org.project.githubrepositories.http.dto.GitHubResponse;
 import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.BranchInfo;
-import org.project.githubrepositories.repository.RepositoryInfo;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 @Log4j2
-public class GitHubHttpClient {
+public class GitHubHttpClient implements RemoteHttpClient {
     private final WebClient webClient;
 
-    public List<RepositoryInfo> getRepositoriesInformationForUser(String username) {
+    public List<RepositoryInfoDto> getRepositoriesInformationForUser(String username) {
         List<GitHubResponse> gitHubResponseList = fetchRepositories(username);
         List<GitHubResponse> repositoriesNotFork = gitHubResponseList.stream()
                 .filter(gitHubResponse -> !gitHubResponse.fork())
@@ -36,7 +37,7 @@ public class GitHubHttpClient {
                     List<BranchInfo> branchInfoList = branchResponseList.stream()
                             .map(Mapper::branchResponseToBranchInfoMapper)
                             .toList();
-                    return new RepositoryInfo(repository.name(), repository.owner().login(), branchInfoList);
+                    return new RepositoryInfoDto(repository.name(), repository.owner().login(), branchInfoList, LocalDateTime.now());
                 })
                 .collect(Collectors.toList());
     }
