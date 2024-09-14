@@ -6,6 +6,7 @@ This project is a Java application that retrieves information about a user's Git
 
 - Java 21
 - Spring Boot 3
+- Lombok
 - MongoDB
 - Spring Data MongoDB
 - Docker Compose
