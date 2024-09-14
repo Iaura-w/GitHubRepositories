@@ -3,6 +3,8 @@ package org.project.githubrepositories.repository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.project.githubrepositories.http.RemoteHttpClient;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,12 +20,12 @@ public class RepositoryInfoService {
     public List<RepositoryInfoDto> getRepositoriesInfoForUser(String username) {
         List<RepositoryInfo> storedRepositories = repositoryInfoRepository.findAllByOwnerLogin(username);
         if (!storedRepositories.isEmpty() && isDataUpToDate(storedRepositories)) {
-            log.info("Found data in repository for user {}", username);
+            log.info("Found data in db repository for user {}", username);
             return storedRepositories.stream()
                     .map(RepositoryInfoMapper::mapToRepositoryInfoDto)
                     .toList();
         } else {
-            log.info("Fetching new data for user {}", username);
+            log.info("Fetching new data from API for user {}", username);
             List<RepositoryInfoDto> freshRepositories = gitHubHttpClient.getRepositoriesInformationForUser(username);
             repositoryInfoRepository.deleteAllByOwnerLogin(username);
             repositoryInfoRepository.saveAll(freshRepositories.stream()

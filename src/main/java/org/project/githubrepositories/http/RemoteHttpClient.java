@@ -1,6 +1,6 @@
 package org.project.githubrepositories.http;
 
-import org.project.githubrepositories.repository.RepositoryInfoDto;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
 
 import java.util.List;
 

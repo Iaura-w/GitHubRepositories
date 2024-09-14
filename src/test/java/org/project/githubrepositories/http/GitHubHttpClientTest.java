@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
-import org.project.githubrepositories.repository.RepositoryInfoDto;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

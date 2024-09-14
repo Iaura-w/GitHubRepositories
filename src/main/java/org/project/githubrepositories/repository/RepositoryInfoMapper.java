@@ -1,5 +1,7 @@
 package org.project.githubrepositories.repository;
 
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
+
 public class RepositoryInfoMapper {
 
     public static RepositoryInfoDto mapToRepositoryInfoDto(RepositoryInfo repositoryInfo) {

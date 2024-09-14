@@ -1,4 +1,6 @@
-package org.project.githubrepositories.repository;
+package org.project.githubrepositories.repository.dto;
+
+import org.project.githubrepositories.repository.BranchInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -7,7 +7,7 @@ import org.project.githubrepositories.http.dto.GitHubResponse;
 import org.project.githubrepositories.http.error.ApiRateLimitException;
 import org.project.githubrepositories.http.error.GitHubUserNotFoundException;
 import org.project.githubrepositories.repository.BranchInfo;
-import org.project.githubrepositories.repository.RepositoryInfoDto;
+import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
