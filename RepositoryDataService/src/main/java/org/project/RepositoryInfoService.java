@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.project.client.GitHubClientService;
 import org.project.dto.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class RepositoryInfoService {
-    private final RestTemplate restTemplate;
     private final RepositoryInfoRepository repositoryInfoRepository;
     private final Clock clock;
     private final GitHubClientService gitHubClientService;
