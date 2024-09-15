@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.project.githubrepositories.http.RemoteHttpClient;
-import org.project.githubrepositories.repository.dto.RepositoryInfoDto;
+import org.project.dto.RepositoryInfoDto;
 
 import java.time.Clock;
 import java.time.Instant;
