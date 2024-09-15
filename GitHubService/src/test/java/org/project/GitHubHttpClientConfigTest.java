@@ -1,4 +1,4 @@
-package org.project.githubrepositories.http;
+package org.project;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
