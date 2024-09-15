@@ -1,12 +1,12 @@
-package org.project.githubrepositories;
+package org.project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GitHubRepositoriesApplication {
+public class RepositoryDataServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GitHubRepositoriesApplication.class, args);
+        SpringApplication.run(RepositoryDataServiceApplication.class, args);
     }
 }

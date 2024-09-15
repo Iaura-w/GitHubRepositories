@@ -18,10 +18,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Log4j2
-public class GitHubService {
+public class GitHubService implements IGitHubService {
 
     private final WebClient webClient;
 
+    @Override
     public List<GitHubResponse> getRepositoriesForUser(String username) {
         log.info("Fetching repositories for user: {}", username);
 
@@ -53,6 +54,7 @@ public class GitHubService {
         }
     }
 
+    @Override
     public List<BranchResponse> getBranchesForRepository(String username, String repositoryName) {
         log.info("Fetching branches for repository: {}/{}", username, repositoryName);
 

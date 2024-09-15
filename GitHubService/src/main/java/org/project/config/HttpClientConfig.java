@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class GitHubHttpClientConfig {
+public class HttpClientConfig {
     private static final String URL_GITHUB = "https://api.github.com";
     public static final int TIMEOUT = 3000;
 

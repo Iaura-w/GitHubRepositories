@@ -1,6 +1,9 @@
 # GitHubRepositories
 
-This project is a Java application that retrieves information about a user's GitHub non-fork repositories and their branches. It uses the GitHub API to fetch repository details, including the repository name, owner's login, and branch information (branch name and last commit SHA). The application also stores the retrieved repository information in a MongoDB database for 1 hour, ensuring that data can be reused without redundant API calls.
+This project is a Java application that retrieves information about a user's GitHub non-fork repositories and their
+branches. It uses the GitHub API to fetch repository details, including the repository name, owner's login, and branch
+information (branch name and last commit SHA). The application also stores the retrieved repository information in a
+MongoDB database for 1 hour, ensuring that data can be reused without redundant API calls.
 
 ## Technologies
 
@@ -12,14 +15,18 @@ This project is a Java application that retrieves information about a user's Git
 - Docker Compose
 
 ## Application
+
 - Use the `docker-compose.yml` file to start MongoDB: ``` docker-compose up -d ```
 - To run application with Gradle: ```$ ./gradlew bootRun```
 - The application should be available at: https://localhost:8080
-- GET http://localhost:8080/repositories/{username}: Retrieves a list of repositories for the specified GitHub username along with
+- GET http://localhost:8080/repositories/{username}: Retrieves a list of repositories for the specified GitHub username
+  along with
   informations.
 
 ## Example responses:
-- lastUpdated: The timestamp indicating when the repository data was last fetched from GitHub and stored in the MongoDB database.
+
+- lastUpdated: The timestamp indicating when the repository data was last fetched from GitHub and stored in the MongoDB
+  database.
 
 - Response for existing user
 

@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/github")
+@RequestMapping("/api/v1/github")
 @AllArgsConstructor
 public class GitHubController {
 
-    private final GitHubService gitHubService;
+    private final IGitHubService gitHubService;
 
     @GetMapping("/repositories/{username}")
     public List<GitHubResponse> getRepositoriesForUser(@PathVariable String username) {

@@ -1,4 +1,3 @@
 rootProject.name = 'GitHubRepositories'
 include 'GitHubService'
 include 'RepositoryDataService'
-
