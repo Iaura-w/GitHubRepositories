@@ -22,7 +22,7 @@ public class RepositoryInfoService {
     private final GitHubClientService gitHubClientService;
 
     public List<RepositoryInfoDto> getRepositoriesInfoForUser(String username) {
-        List<RepositoryInfo> storedRepositories = repositoryInfoRepository.findAllByOwnerLogin(username);
+        List<RepositoryInfo> storedRepositories = repositoryInfoRepository.findAllByOwnerLoginIgnoreCase(username);
         if (!storedRepositories.isEmpty() && isDataUpToDate(storedRepositories)) {
             log.info("Found data in db repository for user {}", username);
             return storedRepositories.stream()
@@ -31,7 +31,7 @@ public class RepositoryInfoService {
         } else {
             log.info("Fetching new data from API for user {}", username);
             List<RepositoryInfoDto> freshRepositories = getRepositoriesAndBranchesForUser(username);
-            repositoryInfoRepository.deleteAllByOwnerLogin(username);
+            repositoryInfoRepository.deleteAllByOwnerLoginIgnoreCase(username);
             repositoryInfoRepository.saveAll(freshRepositories.stream()
                     .map(RepositoryInfoMapper::mapToRepositoryInfo)
                     .toList());

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface RepositoryInfoRepository extends MongoRepository<RepositoryInfo, String> {
 
-    List<RepositoryInfo> findAllByOwnerLogin(String username);
+    List<RepositoryInfo> findAllByOwnerLoginIgnoreCase(String username);
 
-    void deleteAllByOwnerLogin(String username);
+    void deleteAllByOwnerLoginIgnoreCase(String username);
 }
