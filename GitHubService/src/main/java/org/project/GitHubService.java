@@ -28,30 +28,25 @@ public class GitHubService implements IGitHubService {
 
         String path = String.format("/users/%s/repos", username);
 
-        try {
-            return webClient.get()
-                    .uri(path)
-                    .exchangeToMono(response -> {
-                        if (response.statusCode().is2xxSuccessful()) {
-                            log.info("Repositories successfully fetched for user: {}", username);
-                            return response.bodyToMono(new ParameterizedTypeReference<List<GitHubResponse>>() {
-                            });
-                        } else if (response.statusCode().is4xxClientError()) {
-                            log.warn("User {} not found. Status code: {}", username, response.statusCode());
-                            return Mono.error(new GitHubUserNotFoundException(username));
-                        } else if (response.statusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
-                            log.error("API rate limit exceeded while fetching repositories for user: {}", username);
-                            return Mono.error(new ApiRateLimitException());
-                        } else {
-                            log.error("Unexpected error occurred while fetching repositories for user: {}", username);
-                            return Mono.error(new GitHubServiceException("Error fetching repositories for user: " + username));
-                        }
-                    })
-                    .block();
-        } catch (Exception e) {
-            log.error("Error while fetching repositories for user: {}. Error: {}", username, e.getMessage());
-            throw new GitHubServiceException("Failed to fetch repositories for user: " + username);
-        }
+        return webClient.get()
+                .uri(path)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        log.info("Repositories successfully fetched for user: {}", username);
+                        return response.bodyToMono(new ParameterizedTypeReference<List<GitHubResponse>>() {
+                        });
+                    } else if (response.statusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
+                        log.warn("User {} not found. Status code: {}", username, response.statusCode());
+                        return Mono.error(new GitHubUserNotFoundException(username));
+                    } else if (response.statusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
+                        log.error("API rate limit exceeded while fetching repositories for user: {}", username);
+                        return Mono.error(new ApiRateLimitException());
+                    } else {
+                        log.error("Unexpected error occurred while fetching repositories for user: {}", username);
+                        return Mono.error(new GitHubServiceException("Error fetching repositories for user: " + username));
+                    }
+                })
+                .block();
     }
 
     @Override
@@ -60,23 +55,19 @@ public class GitHubService implements IGitHubService {
 
         String path = String.format("/repos/%s/%s/branches", username, repositoryName);
 
-        try {
-            return webClient.get()
-                    .uri(path)
-                    .exchangeToMono(response -> {
-                        if (response.statusCode().is2xxSuccessful()) {
-                            log.info("Branches successfully fetched for repository: {}/{}", username, repositoryName);
-                            return response.bodyToMono(new ParameterizedTypeReference<List<BranchResponse>>() {
-                            });
-                        } else {
-                            log.error("Error while fetching branches for repository: {}/{}. Status code: {}", username, repositoryName, response.statusCode());
-                            return Mono.error(new GitHubServiceException("Error fetching branches for repository: " + repositoryName));
-                        }
-                    })
-                    .block();
-        } catch (Exception e) {
-            log.error("Error while fetching branches for repository: {}/{}. Error: {}", username, repositoryName, e.getMessage());
-            throw new GitHubServiceException("Failed to fetch branches for repository: " + repositoryName);
-        }
+        return webClient.get()
+                .uri(path)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        log.info("Branches successfully fetched for repository: {}/{}", username, repositoryName);
+                        return response.bodyToMono(new ParameterizedTypeReference<List<BranchResponse>>() {
+                        });
+                    } else {
+                        log.error("Error while fetching branches for repository: {}/{}. Status code: {}", username, repositoryName, response.statusCode());
+                        return Mono.error(new GitHubServiceException("Error fetching branches for repository: " + repositoryName));
+                    }
+                })
+                .block();
+
     }
 }
