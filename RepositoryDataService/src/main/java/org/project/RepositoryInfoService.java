@@ -2,7 +2,7 @@ package org.project;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.project.client.GitHubClientService;
+import org.project.client.RemoteHttpClient;
 import org.project.dto.*;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class RepositoryInfoService {
     private final RepositoryInfoRepository repositoryInfoRepository;
     private final Clock clock;
-    private final GitHubClientService gitHubClientService;
+    private final RemoteHttpClient gitHubClientService;
 
     public List<RepositoryInfoDto> getRepositoriesInfoForUser(String username) {
         List<RepositoryInfo> storedRepositories = repositoryInfoRepository.findAllByOwnerLoginIgnoreCase(username);

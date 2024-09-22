@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Log4j2
-public class GitHubClientService {
+public class GitHubClientService implements RemoteHttpClient {
     private final WebClient webClient;
 
     public List<GitHubResponse> fetchRepositoriesForUser(String username) {
